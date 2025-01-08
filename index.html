@@ -1,0 +1,140 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BTU to Tons Converter</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f4f4f9;
+            margin: 0;
+            padding: 0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        .container {
+            background: #ffffff;
+            border-radius: 10px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            padding: 20px;
+            width: 90%;
+            max-width: 400px;
+            text-align: center;
+        }
+        h1 {
+            font-size: 24px;
+            margin-bottom: 20px;
+            color: #333333;
+        }
+        input[type="number"] {
+            width: 94%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        select {
+            width: 100%;
+            padding: 10px;
+            margin: 10px 0;
+            border: 1px solid #cccccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+        .result {
+            margin-top: 20px;
+            font-size: 18px;
+            color: #ee5566;
+        }
+        .buttons {
+            display: flex;
+            justify-content: space-between;
+            margin-top: 20px;
+        }
+        .buttons button {
+            flex: 1;
+            margin: 0 5px;
+            background: #ee5566;
+            color: #ffffff;
+            border: none;
+            padding: 10px;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: background-color 0.3s ease;
+        }
+        .buttons button:hover {
+            background: #cc4455;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <h1>BTU to Tons Converter</h1>
+        <input type="number" id="btuInput" placeholder="Enter BTU" oninput="updateResult()" />
+        <select id="unitSelector" onchange="updateResult()">
+            <option value="tons">Tons of Refrigeration (TR)</option>
+            <option value="watts">Watts (W)</option>
+            <option value="kilowatts">Kilowatts (kW)</option>
+            <option value="megawatts">Megawatts (MW)</option>
+        </select>
+        <div class="result" id="result"></div>
+        <div class="buttons">
+            <button onclick="shareResult()">Share Result</button>
+            <button onclick="reloadPage()">Reload Calculator</button>
+        </div>
+    </div>
+
+    <script>
+        function updateResult() {
+            const btu = parseFloat(document.getElementById('btuInput').value);
+            const unit = document.getElementById('unitSelector').value;
+
+            if (isNaN(btu) || btu <= 0) {
+                document.getElementById('result').innerText = "Please enter a valid BTU value.";
+                return;
+            }
+
+            let result;
+
+            switch (unit) {
+                case "tons":
+                    result = `${btu} BTU = ${(btu / 12000).toFixed(2)} Tons of Refrigeration.`;
+                    break;
+                case "watts":
+                    result = `${btu} BTU = ${(btu * 0.29307107).toFixed(2)} Watts.`;
+                    break;
+                case "kilowatts":
+                    result = `${btu} BTU = ${(btu * 0.00029307107).toFixed(2)} Kilowatts.`;
+                    break;
+                case "megawatts":
+                    result = `${btu} BTU = ${(btu * 0.00000029307107).toFixed(6)} Megawatts.`;
+                    break;
+                default:
+                    result = "Invalid unit selected.";
+            }
+
+            document.getElementById('result').innerText = result;
+        }
+
+        function shareResult() {
+            const resultText = document.getElementById('result').innerText;
+            if (resultText) {
+                navigator.clipboard.writeText(resultText)
+                    .then(() => alert("Result copied to clipboard!"))
+                    .catch(err => alert("Failed to copy result."));
+            } else {
+                alert("No result to share.");
+            }
+        }
+
+        function reloadPage() {
+            window.location.reload();
+        }
+    </script>
+</body>
+</html>
