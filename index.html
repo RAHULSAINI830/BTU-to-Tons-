@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -15,46 +16,60 @@
             align-items: center;
             height: 100vh;
         }
+
         .container {
             background: #ffffff;
             border-radius: 10px;
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
             padding: 20px;
             width: 90%;
-            max-width: 400px;
+            max-width: 500px;
             text-align: center;
         }
+
         h1 {
             font-size: 24px;
             margin-bottom: 20px;
             color: #333333;
         }
+
         input[type="number"] {
-            width: 94%;
+            width: calc(100% - 110px);
             padding: 10px;
             margin: 10px 0;
             border: 1px solid #cccccc;
             border-radius: 5px;
             font-size: 16px;
+            display: inline-block;
+            vertical-align: middle;
         }
+
         select {
-            width: 100%;
+            width: 100px;
             padding: 10px;
-            margin: 10px 0;
+            margin-left: 10px;
             border: 1px solid #cccccc;
             border-radius: 5px;
             font-size: 16px;
+            display: inline-block;
+            vertical-align: middle;
         }
+
         .result {
-            margin-top: 20px;
-            font-size: 18px;
+            margin-top: 50px;
+            margin-bottom: 50px;
+            font-size: 28px;
             color: #ee5566;
+            text-align: center;
+            font-weight: bold;
         }
+
         .buttons {
             display: flex;
             justify-content: space-between;
             margin-top: 20px;
         }
+
         .buttons button {
             flex: 1;
             margin: 0 5px;
@@ -67,22 +82,39 @@
             font-size: 16px;
             transition: background-color 0.3s ease;
         }
+
         .buttons button:hover {
             background: #cc4455;
         }
     </style>
 </head>
+
 <body>
     <div class="container">
         <h1>BTU to Tons Converter</h1>
-        <input type="number" id="btuInput" placeholder="Enter BTU" oninput="updateResult()" />
-        <select id="unitSelector" onchange="updateResult()">
-            <option value="tons">Tons of Refrigeration (TR)</option>
-            <option value="watts">Watts (W)</option>
-            <option value="kilowatts">Kilowatts (kW)</option>
-            <option value="megawatts">Megawatts (MW)</option>
-        </select>
+        <!-- First Section -->
+        <input type="number" id="btuInput" placeholder="Enter BTU" oninput="convertFromBTU()" />
+
+        <!-- Second Section -->
+        <input type="number" id="tonsInput" placeholder="Enter Tons" oninput="convertFromTons()" />
+
+        <!-- Third Section -->
+        <div>
+            <input type="number" id="otherUnitsInput" placeholder="Other Units" disabled />
+            <select id="unitSelector" onchange="updateOtherUnits()">
+                <option value="microwatts">μW</option>
+                <option value="milliwatts">mW</option>
+                <option value="watts">W</option>
+                <option value="kilowatts">kW</option>
+                <option value="megawatts">MW</option>
+                <option value="gigawatts">GW</option>
+            </select>
+        </div>
+
+        <!-- Result -->
         <div class="result" id="result"></div>
+
+        <!-- Buttons -->
         <div class="buttons">
             <button onclick="shareResult()">Share Result</button>
             <button onclick="reloadPage()">Reload Calculator</button>
@@ -90,35 +122,75 @@
     </div>
 
     <script>
-        function updateResult() {
-            const btu = parseFloat(document.getElementById('btuInput').value);
-            const unit = document.getElementById('unitSelector').value;
+        function convertFromBTU() {
+            const btuValue = parseFloat(document.getElementById('btuInput').value);
 
-            if (isNaN(btu) || btu <= 0) {
+            if (isNaN(btuValue) || btuValue <= 0) {
                 document.getElementById('result').innerText = "Please enter a valid BTU value.";
                 return;
             }
 
-            let result;
+            const tonsValue = (btuValue / 12000).toFixed(2);
+            document.getElementById('tonsInput').value = tonsValue;
 
-            switch (unit) {
-                case "tons":
-                    result = `${btu} BTU = ${(btu / 12000).toFixed(2)} Tons of Refrigeration.`;
-                    break;
-                case "watts":
-                    result = `${btu} BTU = ${(btu * 0.29307107).toFixed(2)} Watts.`;
-                    break;
-                case "kilowatts":
-                    result = `${btu} BTU = ${(btu * 0.00029307107).toFixed(2)} Kilowatts.`;
-                    break;
-                case "megawatts":
-                    result = `${btu} BTU = ${(btu * 0.00000029307107).toFixed(6)} Megawatts.`;
-                    break;
-                default:
-                    result = "Invalid unit selected.";
+            // Update third section based on BTU
+            updateOtherUnits();
+
+            document.getElementById('result').innerText = `${btuValue} BTU = ${tonsValue} Tons`;
+        }
+
+        function convertFromTons() {
+            const tonsValue = parseFloat(document.getElementById('tonsInput').value);
+
+            if (isNaN(tonsValue) || tonsValue <= 0) {
+                document.getElementById('result').innerText = "Please enter a valid Tons value.";
+                return;
             }
 
-            document.getElementById('result').innerText = result;
+            const btuValue = (tonsValue * 12000).toFixed(2);
+            document.getElementById('btuInput').value = btuValue;
+
+            // Update third section based on Tons
+            updateOtherUnits();
+
+            document.getElementById('result').innerText = `${tonsValue} Tons = ${btuValue} BTU`;
+        }
+
+        function updateOtherUnits() {
+            const btuValue = parseFloat(document.getElementById('btuInput').value);
+            const unit = document.getElementById('unitSelector').value;
+
+            if (isNaN(btuValue) || btuValue <= 0) {
+                document.getElementById('otherUnitsInput').value = "";
+                return;
+            }
+
+            let conversionValue;
+            switch (unit) {
+                case "microwatts":
+                    conversionValue = (btuValue * 293071.07).toFixed(2);
+                    break;
+                case "milliwatts":
+                    conversionValue = (btuValue * 293.07107).toFixed(2);
+                    break;
+                case "watts":
+                    conversionValue = (btuValue * 0.29307107).toFixed(2);
+                    break;
+                case "kilowatts":
+                    conversionValue = (btuValue * 0.00029307107).toFixed(2);
+                    break;
+                case "megawatts":
+                    conversionValue = (btuValue * 0.00000029307107).toFixed(6);
+                    break;
+                case "gigawatts":
+                    conversionValue = (btuValue * 0.00000000029307107).toFixed(9);
+                    break;
+                default:
+                    conversionValue = "";
+            }
+
+            // Set the converted value in the third input field
+            document.getElementById('otherUnitsInput').value = conversionValue;
         }
 
         function shareResult() {
@@ -137,4 +209,5 @@
         }
     </script>
 </body>
+
 </html>
